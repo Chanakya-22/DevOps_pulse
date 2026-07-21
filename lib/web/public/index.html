@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevOps Pulse - Real-time CI/CD Pipeline Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header / Navbar -->
+    <header class="navbar">
+      <div class="logo-group">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h1>DevOps Pulse</h1>
+          <p class="subtitle" id="project-path">Scanning codebase...</p>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button id="rescan-btn" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          Re-scan Codebase
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <main class="dashboard-grid">
+      <!-- Left Column: Score Card & Quick Metrics -->
+      <section class="card score-card">
+        <div class="card-header">
+          <h2>CI/CD Readiness Score</h2>
+          <span id="grade-badge" class="badge grade-badge">--</span>
+        </div>
+        <div class="score-display">
+          <div class="gauge-wrapper">
+            <svg class="gauge-svg" viewBox="0 0 100 100">
+              <circle class="gauge-bg" cx="50" cy="50" r="42"></circle>
+              <circle class="gauge-fill" id="gauge-fill" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+            </svg>
+            <div class="gauge-text">
+              <span id="score-num" class="score-val">0</span>
+              <span class="score-label">%</span>
+            </div>
+          </div>
+          <div class="status-summary" id="status-summary">
+            Analyzing pipeline prerequisites...
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-pill critical">
+            <span class="m-val" id="cnt-critical">0</span>
+            <span class="m-lbl">Critical</span>
+          </div>
+          <div class="metric-pill warning">
+            <span class="m-val" id="cnt-warning">0</span>
+            <span class="m-lbl">Warnings</span>
+          </div>
+          <div class="metric-pill info">
+            <span class="m-val" id="cnt-info">0</span>
+            <span class="m-lbl">Notice</span>
+          </div>
+          <div class="metric-pill pass">
+            <span class="m-val" id="cnt-pass">0</span>
+            <span class="m-lbl">Passed</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Tech Stack & Overview -->
+      <section class="card tech-card">
+        <div class="card-header">
+          <h2>Project Intelligence & Stack</h2>
+        </div>
+        <div class="stack-info-group">
+          <div class="info-row">
+            <span class="label">Detected Tech Stack:</span>
+            <div id="stack-tags" class="tags-container"></div>
+          </div>
+          <div class="info-row">
+            <span class="label">Total Files & Folders:</span>
+            <span id="file-stats" class="value-text">--</span>
+          </div>
+          <div class="info-row">
+            <span class="label">CI/CD Provider:</span>
+            <span id="cicd-provider" class="value-text">--</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Lockfile Status:</span>
+            <span id="lockfile-status" class="value-text">--</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Full Width: Real-time DevOps Suggestions & One-Click Fixes -->
+      <section class="card full-width suggestions-card">
+        <div class="card-header">
+          <h2>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Automated DevOps Fixes & AI Recommendations
+          </h2>
+        </div>
+        <div id="suggestions-list" class="suggestions-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- Full Width: Pipeline Audit Log & Code Issues -->
+      <section class="card full-width issues-card">
+        <div class="card-header">
+          <h2>Pipeline Check Results & Vulnerabilities</h2>
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="ALL">All</button>
+            <button class="filter-btn" data-filter="CRITICAL">Critical</button>
+            <button class="filter-btn" data-filter="WARNING">Warning</button>
+            <button class="filter-btn" data-filter="INFO">Info</button>
+            <button class="filter-btn" data-filter="PASS">Pass</button>
+          </div>
+        </div>
+        <div id="issues-list" class="issues-table">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- Key Files Tree Preview -->
+      <section class="card full-width tree-card">
+        <div class="card-header">
+          <h2>Detected Key DevOps Configuration Files</h2>
+        </div>
+        <div id="key-files-list" class="key-files-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
