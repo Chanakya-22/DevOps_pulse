@@ -34,3 +34,6 @@ Thumbs.db
 .vscode/
 *.swp
 *.swo
+
+# Local documentation
+devops_pulse_handbook.md

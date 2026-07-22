@@ -101,17 +101,67 @@ The scoring system calculates a CI/CD Readiness Score ranging from 0 to 100 base
 
 ## Installation & Setup
 
-### Local Global Installation
+### Prerequisites
+- **Node.js**: Version 18.0.0 or higher is required.
 
-To register `devops-pulse` as a global executable on your system:
-
+### Local Installation & Dependency Sync
+To set up dependencies and link the package:
 ```bash
-git clone https://github.com/<your-username>/devops-pulse.git
-cd devops-pulse
+# Install package dependencies and update lockfile
+npm install
+
+# Link package globally (optional)
 npm link
 ```
 
-After linking, `devops-pulse` can be executed from any terminal directory.
+### Running Modes Reference
+
+#### 1. CLI Terminal Mode (Full Output)
+Run the auditor scan and view detailed colorized recommendations and grade breakdown directly in your terminal:
+```bash
+# If globally linked:
+devops-pulse
+
+# Alternatively, from project root:
+npm start
+# or:
+node bin/cli.js
+```
+
+#### 2. Quiet CI Pipeline Check (`-c` / `--check`)
+Executes a quiet check suitable for CI pipelines, returning exit status code `0` if DevOps readiness is acceptable (Grade A+ or B, score >= 75%), and exit code `1` if unacceptable:
+```bash
+devops-pulse --check
+# or:
+node bin/cli.js --check
+```
+
+#### 3. Interactive Web Dashboard (`-w` / `--web`)
+Serves and launches the modern glassmorphism dark-mode dashboard in your browser:
+```bash
+npm run web
+# or:
+node bin/cli.js --web
+```
+*Accessible on `http://localhost:3850`.*
+
+#### 4. Auto-Fix Mode (`-f` / `--fix`)
+Interactively apply recommended templates (GitHub Actions pipeline config, docker configs, `.gitignore`, `.env.example`) to the target stack:
+```bash
+devops-pulse --fix
+# or:
+node bin/cli.js --fix
+```
+
+#### 5. Dockerized Execution
+To build and execute the tool and dashboard inside a containerized Docker runtime:
+```bash
+# Build the image
+docker build -t devops-pulse .
+
+# Run the container (binds web dashboard to port 3850)
+docker run -d -p 3850:3850 devops-pulse
+```
 
 ---
 
