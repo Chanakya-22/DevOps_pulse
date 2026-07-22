@@ -21,6 +21,7 @@ program
   .version('1.0.0')
   .option('-w, --web', 'Launch real-time Web UI Dashboard in browser')
   .option('-f, --fix', 'Auto-apply high priority DevOps fixes (GitHub workflow, Dockerfile, etc.)')
+  .option('-c, --check', 'Run a quiet audit for CI pipelines, returning exit code 0 if grade is A or B, and non-zero otherwise')
   .option('-j, --json', 'Output raw JSON audit result')
   .option('-d, --dir <path>', 'Specify target directory path to audit', process.cwd())
   .parse(process.argv);
@@ -38,6 +39,34 @@ if (options.json) {
   const audit = analyzeProject(targetDir);
   console.log(JSON.stringify(audit, null, 2));
   process.exit(0);
+}
+
+// 2. Check Mode (Quiet Audit)
+const isDevopsCheckCmd = process.argv[1] && path.basename(process.argv[1]).includes('devops-check');
+if (options.check || isDevopsCheckCmd) {
+  const audit = analyzeProject(targetDir);
+  const isAcceptable = audit.score >= 75; // Grade B or A+
+
+  console.log(`\n${pc.bold(pc.cyan('⚡ DEVOPS PULSE CI CHECK'))}`);
+  console.log(`${pc.gray('Target Directory:')} ${pc.white(targetDir)}`);
+  console.log(`${pc.gray('Readiness Score :')} ${pc.bold(audit.score + '%')} (${pc.bold(audit.grade)})`);
+
+  const failedIssues = audit.allIssues.filter(issue => issue.type === 'CRITICAL' || issue.type === 'WARNING');
+  if (failedIssues.length > 0) {
+    console.log(`\n${pc.bold('Key Issues:')}`);
+    failedIssues.forEach(issue => {
+      const tag = issue.type === 'CRITICAL' ? pc.red('[CRITICAL]') : pc.yellow('[WARNING]');
+      console.log(`  ${tag} ${issue.message}`);
+    });
+  }
+
+  if (isAcceptable) {
+    console.log(`\n${pc.green('✔ PASS')} - DevOps readiness grade is acceptable (Grade ${audit.grade}).\n`);
+    process.exit(0);
+  } else {
+    console.log(`\n${pc.red('✖ FAIL')} - DevOps readiness grade is unacceptable (Grade ${audit.grade}). Minimum grade of B (75% score) is required.\n`);
+    process.exit(1);
+  }
 }
 
 // 2. Terminal Banner

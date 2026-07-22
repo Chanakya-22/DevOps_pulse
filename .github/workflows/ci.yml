@@ -1,4 +1,4 @@
-name: DevOps Pulse CI Pipeline
+name: DevOps Pulse CI/CD Pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   audit-and-test:
-    name: Build & Audit Dependencies
+    name: Build, Audit & Test
     runs-on: ubuntu-latest
 
     strategy:
@@ -31,8 +31,42 @@ jobs:
       - name: Audit Dependencies & Security
         run: npm audit --audit-level=high || echo "Dependency audit complete"
 
-      - name: Test DevOps Pulse CLI Auditor Execution
+      - name: Test DevOps Pulse CLI Auditor Execution (JSON Mode)
         run: node bin/cli.js --json
 
+      - name: Test DevOps Pulse CLI Auditor Execution (Check Mode)
+        run: node bin/cli.js --check
+
       - name: Verify Binary Executable Link
-        run: npx devops-pulse --json || node bin/cli.js --json
+        run: npx devops-pulse --check || node bin/cli.js --check
+
+  release-and-deploy:
+    name: Continuous Delivery & Deployment
+    needs: audit-and-test
+    runs-on: ubuntu-latest
+    # Only run CD on pushes to main/master (after CI tests pass)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image (Continuous Delivery Check)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: devops-pulse:latest
+
+      - name: Mock Continuous Deployment to Cloud
+        run: |
+          echo "Executing Continuous Deployment (CD) pipeline..."
+          echo "Connecting to production hosting service..."
+          echo "Deploying devops-pulse container: devops-pulse:latest..."
+          echo "Deployment successful! Web dashboard live check: PASSED."

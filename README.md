@@ -129,6 +129,7 @@ devops-pulse [options]
 | :--- | :--- | :--- |
 | `-w` | `--web` | Launches the interactive Web UI Dashboard in your default browser. |
 | `-f` | `--fix` | Prompts to auto-generate missing recommended DevOps files. |
+| `-c` | `--check` | Runs a quiet audit for CI pipelines, returning exit code 0 if grade is A or B (score >= 75%), and 1 otherwise. |
 | `-j` | `--json` | Outputs audit results in JSON format for automated pipelines. |
 | `-d` | `--dir <path>` | Audits a specified target directory instead of the current working directory. |
 
