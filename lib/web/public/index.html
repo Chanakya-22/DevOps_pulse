@@ -8,6 +8,364 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Design updates for remote cloning, tabs, and CodeRabbit-style reviews */
+    .remote-audit-card {
+      background: linear-gradient(135deg, rgba(17, 24, 39, 0.8), rgba(11, 15, 25, 0.9));
+      border-color: rgba(6, 182, 212, 0.15);
+    }
+    .remote-audit-card input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+    }
+    
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--card-border);
+    }
+    .pillar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .pillar-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .pillar-label {
+      color: var(--text-secondary);
+    }
+    .pillar-score {
+      font-family: var(--font-mono);
+      font-weight: 700;
+    }
+    .pillar-bar-bg {
+      background: rgba(255, 255, 255, 0.05);
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    .pillar-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 1s ease;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+    }
+    .status-badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .status-badge.local {
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+    .status-badge.remote {
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--accent-purple);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+
+    /* Tabs Styling */
+    .tab-nav {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 0.5rem;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0.6rem 1.2rem;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .tab-btn.active {
+      background: rgba(6, 182, 212, 0.12) !important;
+      color: var(--accent-cyan) !important;
+      box-shadow: inset 0 0 0 1px rgba(6, 182, 212, 0.2);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Code Review Pane Styles */
+    .reviews-container {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    .file-sidebar {
+      background: var(--bg-secondary);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1rem;
+    }
+    .file-sidebar h3 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+    .file-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .file-item {
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .file-item:hover {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-primary);
+    }
+    .file-item.active {
+      background: rgba(6, 182, 212, 0.08);
+      color: var(--accent-cyan);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+    .issue-count-pill {
+      background: var(--color-critical);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.4rem;
+      border-radius: 10px;
+    }
+    .issue-count-pill.warning { background: var(--color-warning); color: black; }
+    .issue-count-pill.info { background: var(--color-info); }
+
+    /* Code Viewer CodeRabbit style */
+    .code-viewer-panel {
+      background: #0d1117;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+    .code-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    .code-row {
+      display: table-row;
+    }
+    .code-num {
+      display: table-cell;
+      text-align: right;
+      padding-right: 1.25rem;
+      color: #57606a;
+      user-select: none;
+      width: 40px;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .code-line {
+      display: table-cell;
+      padding-left: 1.25rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #c9d1d9;
+    }
+    .code-row.highlighted {
+      background: rgba(239, 68, 68, 0.08);
+    }
+    .code-row.highlighted-warning {
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    /* CodeRabbit Inline Comments box */
+    .review-comment-row {
+      display: table-row;
+    }
+    .review-comment-spacer {
+      display: table-cell;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .review-comment-content {
+      display: table-cell;
+      padding: 0.75rem 1.25rem;
+    }
+    .comment-card {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 4px solid var(--accent-cyan);
+      border-radius: 10px;
+      padding: 1rem;
+      margin: 0.25rem 0;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .comment-card.CRITICAL { border-left-color: var(--color-critical); }
+    .comment-card.WARNING { border-left-color: var(--color-warning); }
+    .comment-card.INFO { border-left-color: var(--color-info); }
+    
+    .comment-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+    .comment-body {
+      font-family: var(--font-main);
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+    .comment-reco {
+      font-family: var(--font-main);
+      font-size: 0.8rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 2px solid #8b5cf6;
+      padding: 0.5rem 0.75rem;
+      color: var(--text-secondary);
+      border-radius: 0 6px 6px 0;
+    }
+
+    /* History Table Styles */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .history-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .history-card:hover {
+      border-color: rgba(6, 182, 212, 0.3);
+      transform: translateY(-1px);
+    }
+    .history-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .history-repo {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+    }
+    .history-meta {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 1rem;
+    }
+    .history-score-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .history-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(8px);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 750px;
+      padding: 2rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      right: 1.5rem;
+      top: 1.5rem;
+      font-size: 1.8rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .close-btn:hover {
+      color: var(--text-primary);
+    }
+    .code-container {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    #modal-code {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #38bdf8;
+      white-space: pre-wrap;
+      word-break: break-all;
+      display: block;
+    }
+  </style>
 </head>
 <body>
   <div class="app-container">
@@ -20,127 +378,234 @@
           </svg>
         </div>
         <div>
-          <h1>DevOps Pulse</h1>
+          <div style="display:flex; align-items:center; gap:0.6rem;">
+            <h1>DevOps Pulse</h1>
+            <span id="scan-type-badge" class="status-badge local">Local</span>
+          </div>
           <p class="subtitle" id="project-path">Scanning codebase...</p>
         </div>
       </div>
       <div class="nav-actions">
         <button id="rescan-btn" class="btn btn-secondary">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-          Re-scan Codebase
+          Load Local Project
         </button>
       </div>
     </header>
 
-    <!-- Main Grid Layout -->
-    <main class="dashboard-grid">
-      <!-- Left Column: Score Card & Quick Metrics -->
-      <section class="card score-card">
-        <div class="card-header">
-          <h2>CI/CD Readiness Score</h2>
-          <span id="grade-badge" class="badge grade-badge">--</span>
+    <!-- Remote Git Repository Auditing Card -->
+    <section class="card full-width remote-audit-card" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <div style="flex-grow: 1; min-width: 300px;">
+        <label for="remote-repo-url" style="display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 0.4rem; font-weight:600;">Audit Remote Git Repository</label>
+        <div style="display: flex; gap: 0.75rem;">
+          <input type="text" id="remote-repo-url" placeholder="e.g. expressjs/express or https://github.com/owner/repo.git" style="flex-grow: 1; padding: 0.65rem 1rem; border-radius: 10px; border: 1px solid var(--card-border); background: rgba(0, 0, 0, 0.35); color: var(--text-primary); font-family: var(--font-mono); font-size: 0.9rem; transition: all 0.2s;">
+          <button id="remote-audit-btn" class="btn btn-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg>
+            Clone & Audit
+          </button>
         </div>
-        <div class="score-display">
-          <div class="gauge-wrapper">
-            <svg class="gauge-svg" viewBox="0 0 100 100">
-              <circle class="gauge-bg" cx="50" cy="50" r="42"></circle>
-              <circle class="gauge-fill" id="gauge-fill" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"></circle>
-            </svg>
-            <div class="gauge-text">
-              <span id="score-num" class="score-val">0</span>
-              <span class="score-label">%</span>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="dashboard-tab">
+        Executive Dashboard
+      </button>
+      <button class="tab-btn" data-tab="reviews-tab">
+        CodeRabbit Review
+      </button>
+      <button class="tab-btn" data-tab="history-tab">
+        Scan History Database
+      </button>
+    </nav>
+
+    <!-- Tab 1: Executive Dashboard Content -->
+    <div id="dashboard-tab" class="tab-content active">
+      <main class="dashboard-grid">
+        <!-- Score Card & Quick Metrics -->
+        <section class="card score-card">
+          <div class="card-header">
+            <h2>CI/CD Readiness Score</h2>
+            <span id="grade-badge" class="badge grade-badge">--</span>
+          </div>
+          <div class="score-display">
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 100 100">
+                <circle class="gauge-bg" cx="50" cy="50" r="42"></circle>
+                <circle class="gauge-fill" id="gauge-fill" cx="50" cy="50" r="42" stroke-dasharray="264" stroke-dashoffset="264"></circle>
+              </svg>
+              <div class="gauge-text">
+                <span id="score-num" class="score-val">0</span>
+                <span class="score-label">%</span>
+              </div>
+            </div>
+            <div class="status-summary" id="status-summary">
+              Analyzing pipeline prerequisites...
             </div>
           </div>
-          <div class="status-summary" id="status-summary">
-            Analyzing pipeline prerequisites...
-          </div>
-        </div>
 
-        <div class="metrics-grid">
-          <div class="metric-pill critical">
-            <span class="m-val" id="cnt-critical">0</span>
-            <span class="m-lbl">Critical</span>
+          <div class="metrics-grid">
+            <div class="metric-pill critical">
+              <span class="m-val" id="cnt-critical">0</span>
+              <span class="m-lbl">Critical</span>
+            </div>
+            <div class="metric-pill warning">
+              <span class="m-val" id="cnt-warning">0</span>
+              <span class="m-lbl">Warnings</span>
+            </div>
+            <div class="metric-pill info">
+              <span class="m-val" id="cnt-info">0</span>
+              <span class="m-lbl">Notice</span>
+            </div>
+            <div class="metric-pill pass">
+              <span class="m-val" id="cnt-pass">0</span>
+              <span class="m-lbl">Passed</span>
+            </div>
           </div>
-          <div class="metric-pill warning">
-            <span class="m-val" id="cnt-warning">0</span>
-            <span class="m-lbl">Warnings</span>
-          </div>
-          <div class="metric-pill info">
-            <span class="m-val" id="cnt-info">0</span>
-            <span class="m-lbl">Notice</span>
-          </div>
-          <div class="metric-pill pass">
-            <span class="m-val" id="cnt-pass">0</span>
-            <span class="m-lbl">Passed</span>
-          </div>
-        </div>
-      </section>
 
-      <!-- Right Column: Tech Stack & Overview -->
-      <section class="card tech-card">
-        <div class="card-header">
-          <h2>Project Intelligence & Stack</h2>
-        </div>
-        <div class="stack-info-group">
-          <div class="info-row">
-            <span class="label">Detected Tech Stack:</span>
-            <div id="stack-tags" class="tags-container"></div>
+          <!-- 4-Pillar Score Section -->
+          <div class="pillars-grid" id="pillars-container">
+            <!-- Populated dynamically -->
           </div>
-          <div class="info-row">
-            <span class="label">Total Files & Folders:</span>
-            <span id="file-stats" class="value-text">--</span>
-          </div>
-          <div class="info-row">
-            <span class="label">CI/CD Provider:</span>
-            <span id="cicd-provider" class="value-text">--</span>
-          </div>
-          <div class="info-row">
-            <span class="label">Lockfile Status:</span>
-            <span id="lockfile-status" class="value-text">--</span>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- Full Width: Real-time DevOps Suggestions & One-Click Fixes -->
-      <section class="card full-width suggestions-card">
-        <div class="card-header">
-          <h2>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            Automated DevOps Fixes & AI Recommendations
-          </h2>
-        </div>
-        <div id="suggestions-list" class="suggestions-grid">
-          <!-- Populated dynamically -->
-        </div>
-      </section>
-
-      <!-- Full Width: Pipeline Audit Log & Code Issues -->
-      <section class="card full-width issues-card">
-        <div class="card-header">
-          <h2>Pipeline Check Results & Vulnerabilities</h2>
-          <div class="filter-group">
-            <button class="filter-btn active" data-filter="ALL">All</button>
-            <button class="filter-btn" data-filter="CRITICAL">Critical</button>
-            <button class="filter-btn" data-filter="WARNING">Warning</button>
-            <button class="filter-btn" data-filter="INFO">Info</button>
-            <button class="filter-btn" data-filter="PASS">Pass</button>
+        <!-- Tech Stack & Overview -->
+        <section class="card tech-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div class="card-header">
+              <h2>Project Intelligence & Stack</h2>
+            </div>
+            <div class="stack-info-group">
+              <div class="info-row">
+                <span class="label">Detected Tech Stack:</span>
+                <div id="stack-tags" class="tags-container"></div>
+              </div>
+              <div class="info-row">
+                <span class="label">Total Files & Folders:</span>
+                <span id="file-stats" class="value-text">--</span>
+              </div>
+              <div class="info-row">
+                <span class="label">CI/CD Provider:</span>
+                <span id="cicd-provider" class="value-text">--</span>
+              </div>
+              <div class="info-row">
+                <span class="label">Lockfile Status:</span>
+                <span id="lockfile-status" class="value-text">--</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div id="issues-list" class="issues-table">
-          <!-- Populated dynamically -->
-        </div>
-      </section>
+          
+          <!-- Git info section if available -->
+          <div id="git-info-box" style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--card-border); font-size:0.875rem;">
+            <h4 style="margin-bottom:0.75rem; color:var(--text-primary); display:flex; align-items:center; gap:0.5rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 15V9a4 4 0 0 0-4-4H9"></path><line x1="6" y1="9" x2="6" y2="15"></line></svg>
+              Git Repository Analytics
+            </h4>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; color:var(--text-secondary);">
+              <div>Branch: <span id="git-branch" class="value-text" style="color:var(--text-primary)">--</span></div>
+              <div>Commits: <span id="git-commits" class="value-text" style="color:var(--text-primary)">--</span></div>
+              <div style="grid-column: 1 / -1;">Contributors: <span id="git-authors" class="value-text" style="color:var(--text-primary)">--</span></div>
+            </div>
+          </div>
+        </section>
 
-      <!-- Key Files Tree Preview -->
-      <section class="card full-width tree-card">
-        <div class="card-header">
-          <h2>Detected Key DevOps Configuration Files</h2>
-        </div>
-        <div id="key-files-list" class="key-files-grid">
-          <!-- Populated dynamically -->
-        </div>
-      </section>
-    </main>
+        <!-- Real-time DevOps Suggestions & One-Click Fixes -->
+        <section class="card full-width suggestions-card">
+          <div class="card-header">
+            <h2>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              Automated DevOps Fixes & AI Recommendations
+            </h2>
+          </div>
+          <div id="suggestions-list" class="suggestions-grid">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+        <!-- Pipeline Audit Log & Code Issues -->
+        <section class="card full-width issues-card">
+          <div class="card-header">
+            <h2>Pipeline Check Results & Vulnerabilities</h2>
+            <div class="filter-group">
+              <button class="filter-btn active" data-filter="ALL">All</button>
+              <button class="filter-btn" data-filter="CRITICAL">Critical</button>
+              <button class="filter-btn" data-filter="WARNING">Warning</button>
+              <button class="filter-btn" data-filter="INFO">Info</button>
+              <button class="filter-btn" data-filter="PASS">Pass</button>
+            </div>
+          </div>
+          <div id="issues-list" class="issues-table">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+
+        <!-- Key Files Tree Preview -->
+        <section class="card full-width tree-card">
+          <div class="card-header">
+            <h2>Detected Key DevOps Configuration Files</h2>
+          </div>
+          <div id="key-files-list" class="key-files-grid">
+            <!-- Populated dynamically -->
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Tab 2: CodeRabbit File Review Tab -->
+    <div id="reviews-tab" class="tab-content">
+      <div class="reviews-container">
+        <!-- Sidebar File list -->
+        <aside class="file-sidebar">
+          <h3>Reviewable Files</h3>
+          <div id="review-files-list" class="file-list">
+            <!-- Populated dynamically -->
+          </div>
+        </aside>
+
+        <!-- Code Inspection View Panel -->
+        <section class="code-viewer-panel">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:0.75rem;">
+            <h2 id="reviewing-filename" style="font-size:1.1rem; font-family:var(--font-mono); color:var(--accent-cyan);">Select a file to inspect reviews</h2>
+            <span id="review-file-badge" class="status-badge" style="display:none;"></span>
+          </div>
+          
+          <div class="code-table" id="review-code-table">
+            <div style="color:var(--text-secondary); text-align:center; padding:3rem; font-family:var(--font-main);">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:1rem; color:var(--text-secondary); opacity:0.5;"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+              <p>No file selected. Click one of the CI/CD files in the sidebar to review inline annotations.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Tab 3: History Database Logs -->
+    <div id="history-tab" class="tab-content">
+      <div id="history-logs-list" class="history-list">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Blueprint Preview Modal -->
+  <div id="preview-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" id="close-modal-btn">&times;</span>
+      <h3 id="modal-title">File Blueprint Preview</h3>
+      <p class="subtitle" id="modal-subtitle" style="margin-top:0.25rem;">Copy this file into your project repository</p>
+      
+      <div class="code-container">
+        <pre><code id="modal-code"></code></pre>
+      </div>
+      
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+        <button id="copy-blueprint-btn" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          Copy to Clipboard
+        </button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
