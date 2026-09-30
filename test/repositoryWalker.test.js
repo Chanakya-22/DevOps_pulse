@@ -146,7 +146,7 @@ test('preserves core structure statistics for the DevOps Pulse repository', () =
   const inventory = createRepositoryInventory(createRepositoryBoundary(repositoryRoot));
   const stats = scanStructure(repositoryRoot, inventory);
 
-  assert.equal(stats.totalFiles, 26);
+  assert.equal(stats.totalFiles, 27);
   assert.equal(stats.totalDirs, 9);
   assert.ok(stats.totalLinesOfCode >= 3969);
   assert.deepEqual(stats.detectedStack, [
