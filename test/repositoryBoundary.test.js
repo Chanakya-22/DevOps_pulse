@@ -30,12 +30,17 @@ test('handles Windows drive paths independently of the host platform', () => {
 test('identifies the canonical application history path without excluding data generally', () => {
   const repositoryRoot = path.resolve(__dirname, '..');
   const boundary = createRepositoryBoundary(repositoryRoot);
+  const genericRoot = path.resolve('generic-project');
+  const genericBoundary = createRepositoryBoundary(genericRoot, {
+    applicationStatePaths: [path.join(genericRoot, 'data', 'history.json')]
+  });
 
   assert.equal(AUDIT_HISTORY_PATH, path.join(repositoryRoot, 'data', 'history.json'));
   assert.equal(boundary.isApplicationStatePath('data/history.json'), true);
   assert.equal(boundary.shouldExclude('data/history.json'), true);
-  assert.equal(boundary.isKnownGeneratedDirectory('data/source.csv'), false);
-  assert.equal(boundary.shouldExclude('data/source.csv'), false);
+  assert.equal(genericBoundary.isApplicationStatePath('data/history.json'), true);
+  assert.equal(genericBoundary.isKnownGeneratedDirectory('data/source.csv'), false);
+  assert.equal(genericBoundary.shouldExclude('data/source.csv'), false);
 });
 
 test('distinguishes paths outside the repository', () => {
